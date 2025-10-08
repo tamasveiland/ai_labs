@@ -1,0 +1,27 @@
+# Example Terraform variables file
+# Copy this file to terraform.tfvars and update with your values
+
+subscription_id     = "00000000-0000-0000-0000-000000000000"
+location            = "eastus"
+resource_group_name = "rg-ai-labs"
+project_name        = "ailabs"
+environment         = "dev"
+
+# GPT Model Configuration
+gpt_model_name       = "gpt-4o"
+gpt_model_version    = "2024-08-06"
+gpt_deployment_capacity = 10
+
+# Azure AI Search Configuration
+search_sku = "basic"
+
+# Storage Configuration
+storage_account_tier             = "Standard"
+storage_account_replication_type = "LRS"
+
+# Tags
+tags = {
+  Environment = "dev"
+  Project     = "AI Labs"
+  ManagedBy   = "Terraform"
+}
