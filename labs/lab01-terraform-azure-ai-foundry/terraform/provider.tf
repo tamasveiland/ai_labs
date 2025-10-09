@@ -27,6 +27,10 @@ provider "azurerm" {
       recover_soft_deleted_key_vaults = true
     }
   }
+  
+  # Use identity-based authentication for storage operations
+  storage_use_azuread = true
+  
   subscription_id = var.subscription_id
 }
 

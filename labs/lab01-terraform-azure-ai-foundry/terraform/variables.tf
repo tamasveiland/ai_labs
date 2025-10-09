@@ -45,6 +45,24 @@ variable "gpt_deployment_capacity" {
   default     = 10
 }
 
+variable "embedding_model_name" {
+  description = "Name of the embedding model to deploy"
+  type        = string
+  default     = "text-embedding-3-large"
+}
+
+variable "embedding_model_version" {
+  description = "Version of the embedding model to deploy"
+  type        = string
+  default     = "1"
+}
+
+variable "embedding_deployment_capacity" {
+  description = "Capacity for the embedding model deployment"
+  type        = number
+  default     = 10
+}
+
 variable "search_sku" {
   description = "SKU for Azure AI Search"
   type        = string

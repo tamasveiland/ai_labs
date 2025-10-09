@@ -2,7 +2,7 @@
 # Copy this file to terraform.tfvars and update with your values
 
 subscription_id     = "00000000-0000-0000-0000-000000000000"
-location            = "eastus"
+location            = "swedencentral"
 resource_group_name = "rg-ai-labs"
 project_name        = "ailabs"
 environment         = "dev"
