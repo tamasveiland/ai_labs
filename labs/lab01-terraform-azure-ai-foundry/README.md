@@ -205,15 +205,164 @@ cd ..\scripts
 
 ### Configure AI Search Indexing (Optional)
 
-To enable blob indexing with AI enrichment:
+To enable blob indexing with AI enrichment, follow these step-by-step instructions using the Azure Portal:
+
+#### Step 1: Access Azure AI Search Service
+
+1. Navigate to the [Azure Portal](https://portal.azure.com)
+2. Go to your Azure AI Search service (created by Terraform)
+3. Click on **"Import data"** to start the indexing wizard
+
+![Search Wizard Step 1](./images/lab01_search_wizard_01.png)
+
+#### Step 2: Configure Data Source
+
+1. Select **"Azure Blob Storage"** as your data source
+2. Enter the connection details for your storage account
+3. Choose the container that contains your documents
+4. Configure parsing mode based on your document types
+
+![Search Wizard Step 2](./images/lab01_search_wizard_02.png)
+
+#### Step 3: Add Cognitive Skills (AI Enrichment)
+
+1. Enable **"Add AI enrichment"** 
+2. Select your Azure OpenAI service for embeddings
+3. Choose the cognitive skills you want to apply:
+   - Text extraction
+   - Entity recognition
+   - Key phrase extraction
+   - Language detection
+
+![Search Wizard Step 3](./images/lab01_search_wizard_03.png)
+
+#### Step 4: Configure Vector Search
+
+1. Enable **"Vectorize text"** option
+2. Select your text-embedding model (text-embedding-3-large)
+3. Choose which fields should be vectorized
+4. Configure vector search settings
+
+![Search Wizard Step 4](./images/lab01_search_wizard_04.png)
+
+#### Step 5: Customize Target Index Schema
+
+1. Review and modify the index schema
+2. Configure field properties:
+   - **Retrievable**: Include in search results
+   - **Filterable**: Enable filtering on this field
+   - **Sortable**: Allow sorting by this field
+   - **Facetable**: Enable faceted navigation
+   - **Searchable**: Include in full-text search
+
+![Search Wizard Step 5](./images/lab01_search_wizard_05.png)
+
+#### Step 6: Configure Indexer Schedule
+
+1. Set the indexer name
+2. Choose the indexing schedule:
+   - **Once**: Run immediately, then stop
+   - **Hourly**: Run every hour
+   - **Daily**: Run once per day
+   - **Custom**: Define your own schedule
+
+![Search Wizard Step 6](./images/lab01_search_wizard_06.png)
+
+#### Step 7: Review and Create
+
+1. Review all configuration settings
+2. Verify the data source, skillset, index, and indexer settings
+3. Click **"Submit"** to create the indexing pipeline
+
+![Search Wizard Step 7](./images/lab01_search_wizard_07.png)
+
+#### Step 8: Monitor Indexing Progress
+
+1. Navigate to the **"Indexers"** tab in your search service
+2. Monitor the indexing progress and status
+3. Check for any errors or warnings
+4. View indexing statistics and document counts
+
+![Search Wizard Step 8](./images/lab01_search_wizard_08.png)
+
+#### Verify Indexing Success
+
+After indexing completes, verify that your documents are searchable:
 
 ```bash
-# Uncomment the search indexing configuration
-cd terraform
-# Edit main.tf and uncomment the search_indexing.tf content
-terraform plan
-terraform apply
+# Test search endpoint (replace with your search service details)
+curl -X POST "https://your-search-service.search.windows.net/indexes/your-index-name/docs/search?api-version=2023-11-01" \
+     -H "Content-Type: application/json" \
+     -H "Authorization: Bearer $(az account get-access-token --resource https://search.azure.com --query accessToken -o tsv)" \
+     -d '{
+       "search": "*",
+       "top": 5,
+       "select": "content,metadata_storage_name"
+     }'
 ```
+
+Or use the **Search Explorer** in the Azure Portal to test queries interactively.
+
+#### Step 9: Add Data Source to AI Foundry Chat Playground
+
+Once your search index is ready, you can connect it to the AI Foundry chat playground for enhanced AI conversations with your documents:
+
+##### Step 9.1: Access Chat Playground
+
+1. Navigate to [Azure AI Foundry](https://ai.azure.com)
+2. Select your hub and project
+3. Go to the **"Chat"** section in the left navigation
+4. Select your GPT-4o deployment
+
+![Chat Playground Step 1](./images/lab01_chat_playground_wizard_01.png)
+
+##### Step 9.2: Add Your Data Source
+
+1. In the chat playground, click on **"Add your data"**
+2. Select **"Add data source"** to configure the connection
+3. Choose **"Azure AI Search"** as your data source type
+
+![Chat Playground Step 2](./images/lab01_chat_playground_wizard_02.png)
+
+##### Step 9.3: Configure Search Connection
+
+1. Select your Azure AI Search service from the dropdown
+2. Choose the search index you created in the previous steps
+3. Configure authentication method (use managed identity if available)
+4. Set the semantic configuration if you enabled semantic search
+
+![Chat Playground Step 3](./images/lab01_chat_playground_wizard_03.png)
+
+##### Step 9.4: Configure Data Parameters
+
+1. Set the **"Number of documents to retrieve"** (typically 3-5)
+2. Configure **"Strictness"** level for document relevance
+3. Choose whether to include citations in responses
+4. Optionally set role information for the AI assistant
+
+![Chat Playground Step 4](./images/lab01_chat_playground_wizard_04.png)
+
+##### Step 9.5: Test Your Setup
+
+1. Click **"Save and close"** to apply the data source configuration
+2. Test the integration by asking questions about your documents
+3. Verify that the AI provides responses based on your indexed content
+4. Check that citations and sources are properly displayed
+
+![Chat Playground Step 5](./images/lab01_chat_playground_wizard_05.png)
+
+##### Test Your RAG Implementation
+
+Now you can test your Retrieval-Augmented Generation (RAG) setup:
+
+```text
+Example queries to try:
+- "What documents do you have access to?"
+- "Summarize the main topics in the uploaded documents"
+- "Tell me about [specific topic from your documents]"
+```
+
+The AI will now use your indexed documents to provide more accurate and contextual responses, with proper citations showing which documents the information came from.
 
 ### Connect to AI Foundry
 
