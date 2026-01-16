@@ -37,6 +37,49 @@ Learn how to provision a complete Azure AI Foundry environment using Terraform. 
 
 **Technologies**: Terraform, Azure AI Foundry, Azure OpenAI, Azure AI Search, PowerShell, Bash
 
+### [Lab 02: OpenTelemetry for AI Agents](./labs/lab02-OTel-Agents/)
+
+Implement comprehensive observability for AI agents using OpenTelemetry. This lab demonstrates:
+
+**Telemetry Implementation:**
+
+- OpenTelemetry tracing and metrics for C# applications
+- Azure Application Insights integration
+- Custom business events and KPI tracking
+- Cosmos DB operation instrumentation
+
+**Technologies**: C#, .NET 8, OpenTelemetry, Azure Application Insights
+
+### [Lab 03: Azure AI Evaluations with Azure Developer CLI](./labs/lab03-azure-ai-evaluations/)
+
+Learn to implement comprehensive evaluations for AI applications using Azure AI Evaluation SDK. This standalone lab covers:
+
+> 🚀 **Self-Contained Lab**: This lab uses Azure Developer CLI (azd) for infrastructure deployment and has no dependencies on Lab 01.
+
+**Evaluation Capabilities:**
+
+- RAG (Retrieval-Augmented Generation) application with Azure OpenAI and Azure AI Search
+- Built-in evaluators: Groundedness, Relevance, Coherence, Fluency, Similarity
+- Custom code-based evaluators for business-specific metrics
+- JSONL test dataset preparation and validation
+- Local evaluation with comprehensive metrics
+
+**CI/CD Integration:**
+
+- GitHub Actions workflow for automated evaluations
+- Pull request comments with evaluation results
+- Quality threshold checks and automated testing
+- Evaluation result artifacts and analysis
+
+**Infrastructure Deployment:**
+
+- Azure Developer CLI (azd) for one-command deployment
+- Bicep templates for Azure OpenAI, AI Search, and Storage
+- Role-based access control (RBAC) with managed identities
+- Complete teardown with `azd down`
+
+**Technologies**: Azure Developer CLI (azd), Azure AI Evaluation SDK, Python, Azure OpenAI, Azure AI Search, GitHub Actions, Bicep
+
 ## Prerequisites
 
 To work with these labs, you'll need:

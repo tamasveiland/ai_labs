@@ -1,0 +1,8 @@
+# Azure Developer CLI configuration
+name: azure-ai-evaluations
+metadata:
+  template: azure-ai-evaluations@0.0.1-beta
+
+infra:
+  provider: bicep
+  path: ./infra

@@ -1,0 +1,10 @@
+{
+  "resourcesResourceGroups": "rg-",
+  "cognitiveServicesAccounts": "oai-",
+  "searchSearchServices": "srch-",
+  "storageStorageAccounts": "st",
+  "keyVaultVaults": "kv-",
+  "machineLearningServicesWorkspaces": "mlw-",
+  "operationalInsightsWorkspaces": "log-",
+  "insightsComponents": "appi-"
+}
