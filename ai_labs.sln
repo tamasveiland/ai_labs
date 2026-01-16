@@ -1,0 +1,32 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "labs", "labs", "{908A2AE8-7277-8D33-5900-B70622523C2F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "lab02-OTel-Agents", "lab02-OTel-Agents", "{30FC459F-7B6E-5677-FC8D-35B313CE78FF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FraudDetectionWorkflow", "labs\lab02-OTel-Agents\FraudDetectionWorkflow.csproj", "{2D85BDA6-0B53-BFB8-1C7C-4994291C0BDA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2D85BDA6-0B53-BFB8-1C7C-4994291C0BDA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2D85BDA6-0B53-BFB8-1C7C-4994291C0BDA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2D85BDA6-0B53-BFB8-1C7C-4994291C0BDA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2D85BDA6-0B53-BFB8-1C7C-4994291C0BDA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{30FC459F-7B6E-5677-FC8D-35B313CE78FF} = {908A2AE8-7277-8D33-5900-B70622523C2F}
+		{2D85BDA6-0B53-BFB8-1C7C-4994291C0BDA} = {30FC459F-7B6E-5677-FC8D-35B313CE78FF}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B34277A1-D6C7-411D-AB44-1BF1E1B29F9B}
+	EndGlobalSection
+EndGlobal
