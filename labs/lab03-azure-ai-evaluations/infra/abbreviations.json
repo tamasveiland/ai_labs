@@ -6,5 +6,7 @@
   "keyVaultVaults": "kv-",
   "machineLearningServicesWorkspaces": "mlw-",
   "operationalInsightsWorkspaces": "log-",
-  "insightsComponents": "appi-"
+  "insightsComponents": "appi-",
+  "webServerFarms": "plan-",
+  "webSitesAppService": "app-"
 }

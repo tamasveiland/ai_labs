@@ -1,0 +1,228 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Agent Tools API",
+    "description": "API for retrieving Eiffel Tower information, order details, and shipment tracking",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://app-ksk7hvjr6tbbk.azurewebsites.net",
+      "description": "Production server"
+    }
+  ],
+  "paths": {
+    "/api/EiffelTower": {
+      "get": {
+        "operationId": "getEiffelTowerInfo",
+        "summary": "Get Eiffel Tower information",
+        "description": "Retrieves information about the Eiffel Tower including opening hours, ticket prices, or location",
+        "tags": ["EiffelTower"],
+        "parameters": [
+          {
+            "name": "infoType",
+            "in": "query",
+            "description": "Type of information to retrieve: hours, tickets, or location",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "hours",
+              "enum": ["hours", "tickets", "location"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved Eiffel Tower information",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EiffelTowerResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Order/{orderId}": {
+      "get": {
+        "operationId": "getOrderDetails",
+        "summary": "Get order details",
+        "description": "Retrieves the details of a specific order by order ID",
+        "tags": ["Order"],
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "description": "The unique identifier of the order",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved order details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Order not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Tracking/{orderId}": {
+      "get": {
+        "operationId": "getTrackingInfo",
+        "summary": "Get tracking information",
+        "description": "Retrieves shipment tracking information for a specific order",
+        "tags": ["Tracking"],
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "description": "The order ID to get tracking information for",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved tracking information",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrackingResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Tracking information not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "EiffelTowerResponse": {
+        "type": "object",
+        "properties": {
+          "info": {
+            "type": "string",
+            "description": "The requested information about the Eiffel Tower"
+          }
+        },
+        "required": ["info"]
+      },
+      "OrderDetails": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The order ID"
+          },
+          "status": {
+            "type": "string",
+            "description": "Current order status"
+          },
+          "deliveryDate": {
+            "type": "string",
+            "description": "Expected delivery date"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of items in the order"
+          },
+          "total": {
+            "type": "number",
+            "format": "double",
+            "description": "Total order amount"
+          }
+        }
+      },
+      "OrderResponse": {
+        "type": "object",
+        "properties": {
+          "order": {
+            "$ref": "#/components/schemas/OrderDetails"
+          },
+          "error": {
+            "type": "string",
+            "description": "Error message if order not found"
+          }
+        }
+      },
+      "TrackingInfo": {
+        "type": "object",
+        "properties": {
+          "trackingNumber": {
+            "type": "string",
+            "description": "The shipment tracking number"
+          },
+          "carrier": {
+            "type": "string",
+            "description": "The shipping carrier"
+          },
+          "status": {
+            "type": "string",
+            "description": "Current shipment status"
+          },
+          "estimatedDelivery": {
+            "type": "string",
+            "description": "Estimated delivery date"
+          }
+        }
+      },
+      "TrackingResponse": {
+        "type": "object",
+        "properties": {
+          "trackingInfo": {
+            "$ref": "#/components/schemas/TrackingInfo"
+          },
+          "error": {
+            "type": "string",
+            "description": "Error message if tracking not found"
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Error message"
+          }
+        }
+      }
+    }
+  }
+}

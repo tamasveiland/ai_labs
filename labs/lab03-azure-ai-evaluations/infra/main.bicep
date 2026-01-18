@@ -33,7 +33,7 @@ var aiFoundryName = 'aif${resourceToken}'
 var aiProjectName = '${aiFoundryName}-project'
 var tags = {
   'azd-env-name': environmentName
-  'lab': 'lab03-azure-ai-evaluations'
+  lab: 'lab03-azure-ai-evaluations'
 }
 
 // Organize resources in a resource group
@@ -56,6 +56,24 @@ module logAnalytics './core/monitor/loganalytics.bicep' = {
   }
 }
 
+// App Service Plan for Agent Tools API
+module appServicePlan './core/host/appserviceplan.bicep' = {
+  name: 'appserviceplan'
+  scope: rg
+  params: {
+    name: '${abbrs.webServerFarms}${resourceToken}'
+    location: location
+    tags: tags
+    sku: {
+      name: 'B1'
+      tier: 'Basic'
+      size: 'B1'
+      family: 'B'
+      capacity: 1
+    }
+  }
+}
+
 // Application Insights
 module appInsights './core/monitor/applicationinsights.bicep' = {
   name: 'appinsights'
@@ -65,6 +83,19 @@ module appInsights './core/monitor/applicationinsights.bicep' = {
     location: location
     tags: tags
     workspaceId: logAnalytics.outputs.id
+  }
+}
+
+// App Service for Agent Tools API
+module appService './core/host/appservice.bicep' = {
+  name: 'appservice'
+  scope: rg
+  params: {
+    name: '${abbrs.webSitesAppService}${resourceToken}'
+    location: location
+    tags: tags
+    appServicePlanId: appServicePlan.outputs.id
+    applicationInsightsConnectionString: appInsights.outputs.connectionString
   }
 }
 
@@ -208,3 +239,7 @@ output AZURE_STORAGE_ENDPOINT string = storage.outputs.primaryEndpoints.blob
 // Key Vault outputs
 output AZURE_KEY_VAULT_NAME string = keyVault.outputs.name
 output AZURE_KEY_VAULT_URI string = keyVault.outputs.vaultUri
+
+// App Service outputs
+output AGENT_TOOLS_API_URI string = appService.outputs.uri
+output AGENT_TOOLS_API_NAME string = appService.outputs.name

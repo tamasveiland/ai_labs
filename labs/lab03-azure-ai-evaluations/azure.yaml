@@ -3,6 +3,12 @@ name: azure-ai-evaluations
 metadata:
   template: azure-ai-evaluations@0.0.1-beta
 
+services:
+  agent-tools-api:
+    project: ./api/AgentToolsApi
+    language: csharp
+    host: appservice
+
 infra:
   provider: bicep
   path: ./infra
