@@ -51,7 +51,8 @@ def setup_model_config(use_api_key: bool = False) -> AzureOpenAIModelConfigurati
 def run_evaluation(
     data_path: str = "../data/test_queries.jsonl",
     output_path: str = "./evaluation_results",
-    use_api_key: bool = False
+    use_api_key: bool = False,
+    azure_ai_project: dict = None
 ):
     """
     Run comprehensive evaluation on RAG application responses.
@@ -60,6 +61,12 @@ def run_evaluation(
         data_path: Path to test dataset (JSONL format)
         output_path: Path to save evaluation results
         use_api_key: Whether to use API key authentication
+        azure_ai_project: Azure AI project connection info for logging to Foundry
+                         Expected format: {
+                             "subscription_id": "...",
+                             "resource_group_name": "...",
+                             "project_name": "..."
+                         }
     """
     print("=" * 80)
     print("Azure AI Evaluations - RAG Application Evaluation")
@@ -109,8 +116,11 @@ def run_evaluation(
         coherence = CoherenceEvaluator(model_config=model_config)
         fluency = FluencyEvaluator(model_config=model_config)
     
-    # Similarity evaluator (code-based, no model needed)
-    similarity = SimilarityEvaluator()
+    # Similarity evaluator (requires model config)
+    if credential:
+        similarity = SimilarityEvaluator(model_config=model_config, credential=credential)
+    else:
+        similarity = SimilarityEvaluator(model_config=model_config)
     
     # Custom code-based evaluator
     from custom_evaluators.response_metrics import ResponseLengthEvaluator
@@ -118,6 +128,10 @@ def run_evaluation(
     
     # Run evaluation using evaluate() API
     print(f"🚀 Running evaluation on: {data_path}")
+    
+    # Log to Azure AI Foundry if project info provided
+    if azure_ai_project:
+        print(f"☁️  Logging results to Azure AI Foundry project: {azure_ai_project['project_name']}")
     print()
     
     result = evaluate(
@@ -168,7 +182,8 @@ def run_evaluation(
                 }
             }
         },
-        output_path=output_path
+        output_path=output_path,
+        azure_ai_project=azure_ai_project
     )
     
     # Display results summary
@@ -221,5 +236,23 @@ if __name__ == "__main__":
     # Determine authentication method
     use_api_key = os.getenv("AZURE_OPENAI_API_KEY") is not None
     
+    # Optional: Configure Azure AI Foundry project for remote logging
+    azure_ai_project = None
+    if all([
+        os.getenv("AZURE_SUBSCRIPTION_ID"),
+        os.getenv("AZURE_RESOURCE_GROUP"),
+        os.getenv("AZURE_AI_PROJECT_NAME")
+    ]):
+        azure_ai_project = {
+            "subscription_id": os.getenv("AZURE_SUBSCRIPTION_ID"),
+            "resource_group_name": os.getenv("AZURE_RESOURCE_GROUP"),
+            "project_name": os.getenv("AZURE_AI_PROJECT_NAME")
+        }
+        print("✅ Azure AI Foundry project configured - results will be logged to cloud")
+    else:
+        print("ℹ️  Running local-only evaluation (results won't appear in Foundry)")
+        print("   To enable cloud logging, set: AZURE_SUBSCRIPTION_ID, AZURE_RESOURCE_GROUP, AZURE_AI_PROJECT_NAME")
+    print()
+    
     # Run evaluation
-    run_evaluation(use_api_key=use_api_key)
+    run_evaluation(use_api_key=use_api_key, azure_ai_project=azure_ai_project)

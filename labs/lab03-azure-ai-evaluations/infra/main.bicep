@@ -24,7 +24,7 @@ param openAiModelName string = 'gpt-4o'
 param openAiModelVersion string = '2024-08-06'
 
 @description('OpenAI model capacity (in thousands of tokens per minute)')
-param openAiModelCapacity int = 30
+param openAiModelCapacity int = 150
 
 // Generate unique suffix for resource names
 var abbrs = loadJsonContent('./abbreviations.json')
