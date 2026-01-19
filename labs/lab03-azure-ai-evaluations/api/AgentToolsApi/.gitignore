@@ -81,3 +81,7 @@ ScaffoldingReadMe.txt
 # Environment files
 .env
 .env.local
+
+# Evaluation data
+evaluation_data.jsonl
+transcript_*.jsonl
