@@ -1,0 +1,37 @@
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
+
+name: "AI Agent Evaluation"
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  run-action:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Azure login using Federated Credentials
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Run Evaluation
+        uses: microsoft/ai-agent-evals@v3-beta
+        with:
+          # Replace placeholders with values for your Foundry Project
+          azure-ai-project-endpoint: "https://aifksk7hvjr6tbbk.services.ai.azure.com/api/projects/aifksk7hvjr6tbbk-project"
+          deployment-name: "gpt-4o"
+          agent-ids: "customer-service-agent-live-eval:5"
+          data-path: ${{ github.workspace }}/path/to/your/data-file
