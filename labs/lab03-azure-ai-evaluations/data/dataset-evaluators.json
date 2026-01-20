@@ -7,7 +7,6 @@
  
     "builtin.intent_resolution",
     "builtin.relevance",
-    "builtin.response_completeness",
 
     "builtin.bleu_score",
     "builtin.f1_score",
@@ -17,13 +16,7 @@
     
     "builtin.task_adherence",
     "builtin.task_completion",
-    "builtin.tool_call_accuracy",
-    "builtin.tool_call_success",
-    "builtin.tool_input_accuracy",
-    "builtin.tool_output_utilization",
-    "builtin.tool_selection",
 
-    "builtin.code_vulnerability",
     "builtin.hate_unfairness",
     "builtin.indirect_attack",
     "builtin.protected_material",
