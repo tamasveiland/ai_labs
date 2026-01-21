@@ -85,7 +85,7 @@ def main() -> None:
                 },
                 "threshold": {
                     "metric": "intent_resolution",  # The metric to evaluate
-                    "min": 4.0,                      # Minimum score to pass (scale 1-5)
+                    "min": 5.0,                      # Minimum score to pass (scale 1-5)
                     "aggregate": "mean"              # How to aggregate across test cases
                 }
             }
