@@ -80,6 +80,36 @@ Learn to implement comprehensive evaluations for AI applications using Azure AI 
 
 **Technologies**: Azure Developer CLI (azd), Azure AI Evaluation SDK, Python, Azure OpenAI, Azure AI Search, GitHub Actions, Bicep
 
+### [Lab 04: GraphRAG with Cosmos DB Gremlin and Azure AI Search](./labs/lab04-graphrag-gremlin/)
+
+Implement a GraphRAG (Graph-based Retrieval-Augmented Generation) solution combining Cosmos DB for Apache Gremlin with Azure AI Search. This lab demonstrates:
+
+**GraphRAG Architecture:**
+
+- Cosmos DB for Apache Gremlin as knowledge graph database
+- Graph data model: Document, Section, Chunk, and Keyword vertices
+- Relationship edges: hasSection, hasChunk, hasKeyword, relatedTo
+- Azure AI Search with vector embeddings for hybrid retrieval
+- Python-based infrastructure deployment and management
+
+**Query Flow Implementation:**
+
+- Keyword extraction from user queries
+- Hybrid search combining full-text and vector similarity
+- Graph validation through keyword edge verification
+- Context expansion via graph traversal
+- Enhanced results with relationship-based context
+
+**Advanced Capabilities:**
+
+- Multi-tenancy support with partition keys
+- Graph-based context expansion and validation
+- Neighboring chunk discovery through graph relationships
+- Document hierarchy navigation (chunk → section → document)
+- Comprehensive Gremlin query examples and patterns
+
+**Technologies**: Python, Cosmos DB for Apache Gremlin, Azure AI Search, Azure OpenAI, Gremlin Query Language
+
 ## Prerequisites
 
 To work with these labs, you'll need:
