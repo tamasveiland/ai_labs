@@ -4,9 +4,24 @@ Graph operations for Cosmos DB Gremlin API.
 This module provides functions for querying and traversing the knowledge graph.
 """
 
+import re
 from typing import List, Dict, Any
 from gremlin_python.driver import client, serializer
 from gremlin_python.driver.protocol import GremlinServerError
+
+
+def sanitize_input(value: str) -> str:
+    """
+    Sanitize input to prevent Gremlin injection.
+    
+    Allows only alphanumeric characters, hyphens, and underscores.
+    This prevents special characters that could be used for injection.
+    """
+    if not value:
+        return ""
+    # Only allow alphanumeric, hyphens, underscores, and spaces
+    sanitized = re.sub(r'[^a-zA-Z0-9\-_\s]', '', value)
+    return sanitized
 
 
 class GraphOperations:
@@ -37,6 +52,10 @@ class GraphOperations:
     
     def get_chunks_by_keyword(self, keyword: str, tenant: str = "default") -> List[str]:
         """Get chunk IDs that have a specific keyword."""
+        # Sanitize inputs to prevent injection
+        keyword = sanitize_input(keyword)
+        tenant = sanitize_input(tenant)
+        
         query = (
             f"g.V().hasLabel('keyword').has('term', '{keyword}')"
             f".out('hasKeyword').has('tenant', '{tenant}')"
@@ -54,6 +73,10 @@ class GraphOperations:
         - Parent document
         - Associated keywords
         """
+        # Sanitize inputs to prevent injection
+        chunk_id = sanitize_input(chunk_id)
+        tenant = sanitize_input(tenant)
+        
         # Get related chunks
         related_chunks_query = (
             f"g.V().hasLabel('chunk').has('chunkId', '{chunk_id}')"
@@ -94,6 +117,10 @@ class GraphOperations:
     
     def verify_keyword_edge(self, chunk_id: str, keyword: str) -> bool:
         """Verify if a chunk has a specific keyword edge."""
+        # Sanitize inputs to prevent injection
+        chunk_id = sanitize_input(chunk_id)
+        keyword = sanitize_input(keyword)
+        
         query = (
             f"g.V().hasLabel('keyword').has('term', '{keyword}')"
             f".out('hasKeyword').has('chunkId', '{chunk_id}').count()"
@@ -103,6 +130,9 @@ class GraphOperations:
     
     def get_chunk_text(self, chunk_id: str) -> str:
         """Get the text content of a chunk."""
+        # Sanitize inputs to prevent injection
+        chunk_id = sanitize_input(chunk_id)
+        
         query = (
             f"g.V().hasLabel('chunk').has('chunkId', '{chunk_id}')"
             f".values('text')"
@@ -112,6 +142,11 @@ class GraphOperations:
     
     def get_neighboring_chunks(self, chunk_id: str, max_distance: int = 2) -> List[str]:
         """Get chunks within a certain graph distance."""
+        # Sanitize inputs to prevent injection
+        chunk_id = sanitize_input(chunk_id)
+        # Validate max_distance is an integer and within reasonable bounds
+        max_distance = max(1, min(int(max_distance), 10))
+        
         query = (
             f"g.V().hasLabel('chunk').has('chunkId', '{chunk_id}')"
             f".repeat(both().simplePath()).times({max_distance})"
@@ -121,6 +156,9 @@ class GraphOperations:
     
     def find_chunks_by_document(self, doc_id: str) -> List[Dict[str, Any]]:
         """Find all chunks for a specific document."""
+        # Sanitize inputs to prevent injection
+        doc_id = sanitize_input(doc_id)
+        
         query = (
             f"g.V().hasLabel('document').has('docId', '{doc_id}')"
             f".out('hasSection').out('hasChunk').valueMap()"
