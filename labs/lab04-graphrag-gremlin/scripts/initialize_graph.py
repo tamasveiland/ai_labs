@@ -259,7 +259,8 @@ def main():
         print("=" * 80)
         print("\nNext Steps:")
         print("  1. Run: python scripts/setup_search_index.py")
-        print("  2. Run: python scripts/load_sample_data.py")
+        print("  2. Run: python scripts/setup_search_indexer.py  # Auto-sync from Cosmos DB")
+        print("  3. Test queries with: python src/query_graphrag.py")
         print("=" * 80 + "\n")
         
     except Exception as e:

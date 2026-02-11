@@ -83,21 +83,27 @@ python scripts/setup_search_index.py
 ```
 
 This creates:
-- 🔍 Chunks index with 9 fields
-- 🎯 Vector search configuration (1536 dimensions)
+- 🔍 Chunks index with 6 fields
+- 🎯 Vector search configuration (3072 dimensions for text-embedding-3-large)
 - 📈 Semantic search configuration
 
-## Step 6: Load Sample Data (3 minutes)
+## Step 6: Setup Search Indexer (2 minutes)
 
 ```bash
-# Generate embeddings and load data to search index
-python scripts/load_sample_data.py
+# Create indexer to automatically sync Cosmos DB chunks to AI Search
+python scripts/setup_search_indexer.py
 ```
 
-This loads:
-- 📄 4 sample chunks with embeddings
-- 🔑 Associated keywords
-- 🏷️ Document and section metadata
+This creates:
+- 💾 Data source connected to Cosmos DB Gremlin graph
+- 🧠 Skillset for Azure OpenAI embedding generation
+- 🔄 Indexer that automatically pulls and indexes chunk data
+
+The indexer will:
+- Pull chunk vertices from Cosmos DB Gremlin
+- Generate embeddings using Azure OpenAI
+- Index documents to Azure AI Search
+- Run automatically every hour
 
 ## Step 7: Test Queries (1 minute)
 
@@ -124,7 +130,7 @@ python src/query_graphrag.py --query "azure openai" --semantic
   Keywords: ['azure', 'services']
 
 [Step 2/5] Generating query embedding...
-  Embedding dimensions: 1536
+  Embedding dimensions: 3072
 
 [Step 3/5] Performing hybrid search...
   Found 50 candidates

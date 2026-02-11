@@ -36,12 +36,20 @@ def get_search_admin_key(subscription_id: str, resource_group: str, service_name
     admin_keys = search_mgmt_client.admin_keys.get(resource_group, service_name)
     return admin_keys.primary_key
 
-def create_chunks_index(index_client: SearchIndexClient, index_name: str):
-    """Create the chunks search index with vector search."""
+def create_chunks_index(index_client: SearchIndexClient, index_name: str, embedding_dimensions: int = 3072):
+    """Create the chunks search index with vector search.
+    
+    Args:
+        index_client: The SearchIndexClient instance
+        index_name: Name of the index to create
+        embedding_dimensions: Dimensions for the embedding vector (default: 3072 for text-embedding-3-large)
+    """
     
     print(f"\n📊 Creating search index: {index_name}")
     
-    # Define fields
+    # Define fields - aligned with Cosmos DB Gremlin chunk vertex properties
+    # The indexer will pull: id (→chunkId), docId (→documentId), text, tenant, position
+    # The skillset will generate: embedding
     fields = [
         SimpleField(
             name="chunkId",
@@ -56,27 +64,16 @@ def create_chunks_index(index_client: SearchIndexClient, index_name: str):
             filterable=True,
             sortable=True
         ),
-        SimpleField(
-            name="sectionId",
-            type=SearchFieldDataType.String,
-            filterable=True,
-            sortable=True
-        ),
         SearchableField(
             name="text",
             type=SearchFieldDataType.String,
             analyzer_name="en.microsoft"
         ),
-        SearchableField(
-            name="keywords",
-            type=SearchFieldDataType.Collection(SearchFieldDataType.String),
-            filterable=True
-        ),
         SearchField(
             name="embedding",
             type=SearchFieldDataType.Collection(SearchFieldDataType.Single),
             searchable=True,
-            vector_search_dimensions=1536,
+            vector_search_dimensions=embedding_dimensions,
             vector_search_profile_name="embedding-profile"
         ),
         SimpleField(
@@ -89,10 +86,6 @@ def create_chunks_index(index_client: SearchIndexClient, index_name: str):
             type=SearchFieldDataType.Int32,
             filterable=True,
             sortable=True
-        ),
-        SimpleField(
-            name="metadata",
-            type=SearchFieldDataType.String
         )
     ]
     
@@ -123,9 +116,6 @@ def create_chunks_index(index_client: SearchIndexClient, index_name: str):
         prioritized_fields=SemanticPrioritizedFields(
             content_fields=[
                 SemanticField(field_name="text")
-            ],
-            keywords_fields=[
-                SemanticField(field_name="keywords")
             ]
         )
     )
@@ -146,7 +136,7 @@ def create_chunks_index(index_client: SearchIndexClient, index_name: str):
         result = index_client.create_or_update_index(index)
         print(f"✓ Search index created: {result.name}")
         print(f"  Fields: {len(result.fields)}")
-        print(f"  Vector search: Enabled (1536 dimensions)")
+        print(f"  Vector search: Enabled ({embedding_dimensions} dimensions)")
         print(f"  Semantic search: Enabled")
         return result
     except Exception as e:
@@ -173,10 +163,16 @@ def main():
         sys.exit(1)
     
     print(f"\nConfiguration:")
+    embedding_model = os.getenv('EMBEDDING_MODEL_NAME', 'text-embedding-3-large')
+    # text-embedding-3-large uses 3072 dimensions, text-embedding-3-small uses 1536
+    embedding_dimensions = 3072 if 'large' in embedding_model else 1536
+    
     print(f"  Subscription:      {subscription_id}")
     print(f"  Resource Group:    {resource_group}")
     print(f"  Search Service:    {search_service_name}")
     print(f"  Index Name:        {index_name}")
+    print(f"  Embedding Model:   {embedding_model}")
+    print(f"  Embedding Dims:    {embedding_dimensions}")
     
     try:
         # Get search admin key
@@ -189,7 +185,7 @@ def main():
         index_client = SearchIndexClient(search_endpoint, credential)
         
         # Create index
-        create_chunks_index(index_client, index_name)
+        create_chunks_index(index_client, index_name, embedding_dimensions)
         
         print("\n" + "=" * 80)
         print("✅ Search Index Setup Complete!")
@@ -198,8 +194,10 @@ def main():
         print(f"  Name: {index_name}")
         print(f"  Endpoint: {search_endpoint}")
         print("\nNext Steps:")
-        print("  1. Run: python scripts/load_sample_data.py")
+        print("  1. Run: python scripts/setup_search_indexer.py  # Set up automatic indexing")
         print("  2. Test queries with: python src/query_graphrag.py")
+        print("\nAlternatively, for manual data loading:")
+        print("  python scripts/load_sample_data.py")
         print("=" * 80 + "\n")
         
     except Exception as e:

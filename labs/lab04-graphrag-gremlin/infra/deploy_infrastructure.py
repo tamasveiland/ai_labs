@@ -29,7 +29,7 @@ from azure.mgmt.cosmosdb.models import (
     CreateUpdateOptions
 )
 from azure.mgmt.search import SearchManagementClient
-from azure.mgmt.search.models import SearchService, Sku as SearchSku
+from azure.mgmt.search.models import SearchService, Sku as SearchSku, Identity, IdentityType
 from azure.mgmt.cognitiveservices import CognitiveServicesManagementClient
 from azure.mgmt.cognitiveservices.models import Account, Sku, AccountProperties, Deployment, DeploymentProperties, DeploymentModel
 from azure.mgmt.storage import StorageManagementClient
@@ -141,7 +141,7 @@ def create_gremlin_database_and_graph(credential, config: Config):
     return gremlin_db, gremlin_graph
 
 def create_search_service(credential, config: Config):
-    """Create Azure AI Search service."""
+    """Create Azure AI Search service with system-assigned managed identity."""
     print(f"\n[4/6] Creating Azure AI Search Service: {config.search_service_name}")
     
     search_client = SearchManagementClient(credential, config.subscription_id)
@@ -151,10 +151,11 @@ def create_search_service(credential, config: Config):
         sku=SearchSku(name=config.search_sku),
         replica_count=1,
         partition_count=1,
+        identity=Identity(type=IdentityType.SYSTEM_ASSIGNED),
         tags=config.tags
     )
     
-    print(f"  Creating search service (this may take 3-5 minutes)...")
+    print(f"  Creating search service with managed identity (this may take 3-5 minutes)...")
     async_search_create = search_client.services.begin_create_or_update(
         config.resource_group_name,
         config.search_service_name,
@@ -163,6 +164,8 @@ def create_search_service(credential, config: Config):
     
     search_result = async_search_create.result()
     print(f"✓ Search service created: {search_result.name}")
+    if search_result.identity:
+        print(f"  Managed Identity Principal ID: {search_result.identity.principal_id}")
     
     return search_result
 

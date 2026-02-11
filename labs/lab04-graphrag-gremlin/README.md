@@ -67,13 +67,10 @@ graph TB
 **Fields:**
 - `chunkId` (string, key): Unique identifier matching Gremlin vertex
 - `documentId` (string, filterable): Parent document reference
-- `sectionId` (string, filterable): Parent section reference
 - `text` (string, searchable): Chunk content for full-text search
-- `keywords` (Collection(string), searchable): Extracted keywords
-- `embedding` (Collection(Single), searchable): Vector embedding (1536 dimensions)
+- `embedding` (Collection(Single), searchable): Vector embedding (3072 dimensions for text-embedding-3-large)
 - `tenant` (string, filterable): Multi-tenancy support
 - `position` (int32): Position within document
-- `metadata` (string): Additional JSON metadata
 
 ## 🚀 Quick Start
 
@@ -112,13 +109,17 @@ python scripts/setup_search_index.py
 
 Creates the chunks index with vector search configuration.
 
-### 4. Load Sample Data
+### 4. Setup Search Indexer
 
 ```bash
-python scripts/load_sample_data.py
+python scripts/setup_search_indexer.py
 ```
 
-Loads sample documents into both Gremlin and Azure AI Search.
+Creates a data source, skillset, and indexer to automatically:
+- Pull chunk vertices from Cosmos DB Gremlin
+- Generate embeddings using Azure OpenAI
+- Index documents to Azure AI Search
+- Sync changes every hour
 
 ### 5. Run Sample Queries
 
@@ -173,7 +174,8 @@ lab04-graphrag-gremlin/
 ├── scripts/                            # Setup and utility scripts
 │   ├── initialize_graph.py            # Create graph schema
 │   ├── setup_search_index.py          # Create AI Search index
-│   ├── load_sample_data.py            # Load sample documents
+│   ├── setup_search_indexer.py        # Create indexer for auto-sync from Cosmos DB
+│   ├── load_sample_data.py            # Manual data loading (optional)
 │   └── requirements.txt               # Script dependencies
 ├── src/                                # Application code
 │   ├── graphrag_client.py             # Main GraphRAG client

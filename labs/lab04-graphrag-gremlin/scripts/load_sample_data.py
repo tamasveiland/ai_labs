@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
 """
-Load sample data into Azure AI Search index.
+Load sample data into Azure AI Search index (MANUAL METHOD).
 
 This script generates embeddings and loads chunk data into the search index.
+
+NOTE: This script is for manual data loading. For automatic indexing from 
+Cosmos DB Gremlin, use the setup_search_indexer.py script instead, which
+creates an indexer that automatically syncs data from Cosmos DB to AI Search.
 """
 
 import os
