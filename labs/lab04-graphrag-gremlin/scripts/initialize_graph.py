@@ -12,6 +12,7 @@ from gremlin_python.driver import client, serializer
 from gremlin_python.driver.protocol import GremlinServerError
 from azure.identity import DefaultAzureCredential
 from azure.mgmt.cosmosdb import CosmosDBManagementClient
+from dotenv import load_dotenv as loadenv
 
 def get_gremlin_connection_info(subscription_id: str, resource_group: str, account_name: str):
     """Get Gremlin connection information from Azure."""
@@ -21,9 +22,9 @@ def get_gremlin_connection_info(subscription_id: str, resource_group: str, accou
     # Get account keys
     keys = cosmos_client.database_accounts.list_keys(resource_group, account_name)
     
-    # Get account endpoint
-    account = cosmos_client.database_accounts.get(resource_group, account_name)
-    gremlin_endpoint = account.gremlin_endpoint
+    # Construct Gremlin endpoint from account name
+    # Format: wss://{account_name}.gremlin.cosmos.azure.com:443/
+    gremlin_endpoint = f"wss://{account_name}.gremlin.cosmos.azure.com:443/"
     
     return {
         'endpoint': gremlin_endpoint,
@@ -32,11 +33,10 @@ def get_gremlin_connection_info(subscription_id: str, resource_group: str, accou
 
 def create_gremlin_client(endpoint: str, database: str, graph: str, key: str):
     """Create Gremlin client connection."""
-    # Extract host from endpoint
-    host = endpoint.replace('https://', '').replace(':443/', '')
-    
+    # Endpoint is already in format: wss://{account}.gremlin.cosmos.azure.com:443/
+    # Just use it directly
     return client.Client(
-        f'wss://{host}:443/',
+        endpoint,
         'g',
         username=f"/dbs/{database}/colls/{graph}",
         password=key,
@@ -47,8 +47,9 @@ def execute_query(gremlin_client, query: str):
     """Execute a Gremlin query."""
     try:
         callback = gremlin_client.submitAsync(query)
-        result = callback.result()
-        return result
+        result_set = callback.result()
+        # Convert ResultSet to list for subscripting
+        return list(result_set)
     except GremlinServerError as e:
         print(f"Error executing query: {e}")
         return None
@@ -126,11 +127,11 @@ def initialize_graph_schema(gremlin_client):
     # Create Keyword vertices
     print("  Creating Keyword vertices...")
     keyword_queries = [
-        "g.addV('keyword').property('id', 'kw-azure').property('term', 'azure').property('frequency', 10)",
-        "g.addV('keyword').property('id', 'kw-ai').property('term', 'ai').property('frequency', 8)",
-        "g.addV('keyword').property('id', 'kw-search').property('term', 'search').property('frequency', 6)",
-        "g.addV('keyword').property('id', 'kw-graph').property('term', 'graph').property('frequency', 5)",
-        "g.addV('keyword').property('id', 'kw-rag').property('term', 'rag').property('frequency', 7)",
+        "g.addV('keyword').property('id', 'kw-azure').property('term', 'azure').property('frequency', 10).property('tenant', 'default')",
+        "g.addV('keyword').property('id', 'kw-ai').property('term', 'ai').property('frequency', 8).property('tenant', 'default')",
+        "g.addV('keyword').property('id', 'kw-search').property('term', 'search').property('frequency', 6).property('tenant', 'default')",
+        "g.addV('keyword').property('id', 'kw-graph').property('term', 'graph').property('frequency', 5).property('tenant', 'default')",
+        "g.addV('keyword').property('id', 'kw-rag').property('term', 'rag').property('frequency', 7).property('tenant', 'default')",
     ]
     
     for query in keyword_queries:
@@ -208,6 +209,8 @@ def main():
     print("\n" + "=" * 80)
     print("GraphRAG - Initialize Gremlin Graph")
     print("=" * 80)
+
+    loadenv()
     
     # Get configuration from environment
     subscription_id = os.getenv('AZURE_SUBSCRIPTION_ID')
@@ -247,6 +250,9 @@ def main():
         
         # Verify graph
         verify_graph(gremlin_client)
+        
+        # Close the client connection
+        gremlin_client.close()
         
         print("\n" + "=" * 80)
         print("✅ Graph Initialization Complete!")

@@ -40,6 +40,7 @@ from azure.mgmt.storage.models import (
     BlobContainer
 )
 from config import Config
+from dotenv import load_dotenv as loadenv
 
 def create_resource_group(credential, config: Config):
     """Create Azure Resource Group."""
@@ -266,6 +267,8 @@ def main():
     print("GraphRAG Infrastructure Deployment")
     print("=" * 80)
     
+    loadenv()  # Load environment variables from .env file if present
+
     # Load configuration
     config = Config()
     config.display()
@@ -284,7 +287,7 @@ def main():
     try:
         credential = DefaultAzureCredential()
         # Test the credential
-        from azure.mgmt.resource import SubscriptionClient
+        from azure.mgmt.subscription import SubscriptionClient
         sub_client = SubscriptionClient(credential)
         subscription = sub_client.subscriptions.get(config.subscription_id)
         print(f"✓ Authenticated to subscription: {subscription.display_name}")

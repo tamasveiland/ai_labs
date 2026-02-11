@@ -11,7 +11,7 @@ class Config:
         # Azure subscription and resource group
         self.subscription_id: Optional[str] = os.getenv('AZURE_SUBSCRIPTION_ID')
         self.resource_group_name: str = os.getenv('RESOURCE_GROUP_NAME', 'rg-graphrag-lab')
-        self.location: str = os.getenv('AZURE_LOCATION', 'eastus')
+        self.location: str = os.getenv('AZURE_LOCATION', 'swedencentral')
         
         # Resource naming
         self.project_name: str = os.getenv('PROJECT_NAME', 'graphrag')
@@ -49,8 +49,6 @@ class Config:
         self.tags = {
             'Environment': self.environment,
             'Project': self.project_name,
-            'Purpose': 'GraphRAG Lab',
-            'ManagedBy': 'Python'
         }
     
     def validate(self) -> bool:
