@@ -25,6 +25,8 @@ from azure.search.documents.indexes.models import (
     SemanticSearch
 )
 from azure.mgmt.search import SearchManagementClient
+from dotenv import load_dotenv as loadenv
+
 
 def get_search_admin_key(subscription_id: str, resource_group: str, service_name: str) -> str:
     """Get the admin key for Azure AI Search."""
@@ -156,6 +158,8 @@ def main():
     print("\n" + "=" * 80)
     print("GraphRAG - Setup Azure AI Search Index")
     print("=" * 80)
+
+    loadenv()  # Load environment variables from .env file if present
     
     # Get configuration from environment
     subscription_id = os.getenv('AZURE_SUBSCRIPTION_ID')
