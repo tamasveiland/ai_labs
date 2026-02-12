@@ -29,11 +29,22 @@ class GraphOperations:
     
     def __init__(self, endpoint: str, database: str, graph: str, key: str):
         """Initialize Gremlin client."""
-        # Extract host from endpoint
-        host = endpoint.replace('https://', '').replace(':443/', '')
+        # Endpoint should be in format: wss://{account}.gremlin.cosmos.azure.com:443/
+        # Normalize the endpoint to ensure proper format
+        if not endpoint.startswith('wss://'):
+            # Convert from https:// or add protocol
+            endpoint = endpoint.replace('https://', 'wss://')
+            if not endpoint.startswith('wss://'):
+                endpoint = f'wss://{endpoint}'
+        
+        # Ensure port and trailing slash
+        if ':443' not in endpoint:
+            endpoint = endpoint.rstrip('/') + ':443/'
+        if not endpoint.endswith('/'):
+            endpoint = endpoint + '/'
         
         self.client = client.Client(
-            f'wss://{host}:443/',
+            endpoint,
             'g',
             username=f"/dbs/{database}/colls/{graph}",
             password=key,
@@ -126,7 +137,13 @@ class GraphOperations:
             f".out('hasKeyword').has('chunkId', '{chunk_id}').count()"
         )
         result = self.execute_query(query)
-        return result[0] > 0 if result else False
+        if not result:
+            return False
+        # Handle nested list from Gremlin result
+        count = result[0]
+        if isinstance(count, list):
+            count = count[0] if count else 0
+        return count > 0
     
     def get_chunk_text(self, chunk_id: str) -> str:
         """Get the text content of a chunk."""

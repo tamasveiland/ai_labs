@@ -80,6 +80,12 @@ graph TB
 - Python 3.9 or later
 - Azure CLI installed and authenticated
 
+### Option A: Use Jupyter Notebook (Recommended for Learning)
+
+Open [`environment_setup.ipynb`](environment_setup.ipynb) for a guided, step-by-step deployment with explanations.
+
+### Option B: Use Python Scripts
+
 ### 1. Deploy Infrastructure
 
 ```bash
@@ -124,7 +130,11 @@ Creates a data source, skillset, and indexer to automatically:
 ### 5. Run Sample Queries
 
 ```bash
+# Standard GraphRAG query with graph validation
 python src/query_graphrag.py --query "What are the main topics in the documents?"
+
+# Two-phase query (semantic search + graph exploration)
+python src/custom_query_graphrag.py --query "azure ai services"
 ```
 
 ## 📊 Query Flow Details
@@ -155,6 +165,36 @@ For each candidate `chunkId`:
 ### Step 5: Context Assembly & Generation
 Assemble enhanced context and pass to Azure OpenAI for final answer generation.
 
+## 🔄 Two-Phase Query Approach
+
+For learning and debugging purposes, use `custom_query_graphrag.py` which clearly separates the two phases:
+
+### Phase 1: Semantic Search (Azure AI Search)
+- Generates vector embeddings for the user query
+- Performs hybrid search (text + vector) in Azure AI Search
+- Returns ranked chunks with relevance scores
+
+### Phase 2: Graph Exploration (Cosmos DB Gremlin)
+For each chunk found in Phase 1:
+- Finds related chunks via `relatedTo` edges
+- Retrieves parent section and document metadata
+- Extracts associated keywords
+- Aggregates all discovered relationships
+
+**Usage:**
+```bash
+# Two-phase query with clear output separation
+python src/custom_query_graphrag.py --query "azure ai services"
+
+# With JSON output for integration
+python src/custom_query_graphrag.py --query "azure ai services" --json
+```
+
+This approach is ideal for:
+- Understanding how GraphRAG combines search and graph traversal
+- Debugging search relevance vs. graph connectivity issues
+- Building intuition about relationship discovery
+
 ## 🔐 Security & Multi-Tenancy
 
 - **Managed Identities**: All services use Azure Managed Identity for authentication
@@ -167,6 +207,9 @@ Assemble enhanced context and pass to Azure OpenAI for final answer generation.
 ```
 lab04-graphrag-gremlin/
 ├── README.md                           # This file
+├── QUICKSTART.md                       # Quick start guide
+├── graphrag_demo.ipynb                 # Interactive query demo notebook
+├── environment_setup.ipynb             # Azure environment provisioning notebook
 ├── infra/                              # Infrastructure provisioning
 │   ├── deploy_infrastructure.py       # Main deployment script
 │   ├── config.py                      # Configuration settings
@@ -179,7 +222,8 @@ lab04-graphrag-gremlin/
 │   └── requirements.txt               # Script dependencies
 ├── src/                                # Application code
 │   ├── graphrag_client.py             # Main GraphRAG client
-│   ├── query_graphrag.py              # Query interface
+│   ├── query_graphrag.py              # Standard query interface
+│   ├── custom_query_graphrag.py       # Two-phase query (search + graph exploration)
 │   ├── graph_operations.py            # Gremlin operations
 │   ├── search_operations.py           # AI Search operations
 │   ├── embeddings.py                  # OpenAI embeddings

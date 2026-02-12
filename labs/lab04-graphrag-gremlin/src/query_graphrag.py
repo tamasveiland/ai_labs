@@ -19,6 +19,8 @@ from search_operations import SearchOperations
 from embeddings import EmbeddingsClient
 from graphrag_client import GraphRAGClient
 
+from dotenv import load_dotenv as loadenv
+
 
 def get_cosmos_config(subscription_id: str, resource_group: str, account_name: str) -> dict:
     """Get Cosmos DB Gremlin connection configuration."""
@@ -26,10 +28,13 @@ def get_cosmos_config(subscription_id: str, resource_group: str, account_name: s
     cosmos_client = CosmosDBManagementClient(credential, subscription_id)
     
     keys = cosmos_client.database_accounts.list_keys(resource_group, account_name)
-    account = cosmos_client.database_accounts.get(resource_group, account_name)
+    
+    # Construct Gremlin endpoint from account name
+    # Format: wss://{account-name}.gremlin.cosmos.azure.com:443/
+    gremlin_endpoint = f"wss://{account_name}.gremlin.cosmos.azure.com:443/"
     
     return {
-        'endpoint': account.gremlin_endpoint,
+        'endpoint': gremlin_endpoint,
         'key': keys.primary_master_key
     }
 
@@ -109,6 +114,9 @@ def print_results(response: dict, verbose: bool = False):
 
 
 def main():
+
+    loadenv()  # Load environment variables from .env file if present
+
     """Main function."""
     parser = argparse.ArgumentParser(
         description='Query GraphRAG system with Cosmos DB Gremlin and Azure AI Search'

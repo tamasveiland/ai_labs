@@ -32,7 +32,7 @@ class SearchOperations:
             search_text=query,
             top=top,
             filter=filters,
-            select=["chunkId", "documentId", "text", "keywords"]
+            select=["chunkId", "documentId", "text"]
         )
         
         return [
@@ -40,7 +40,6 @@ class SearchOperations:
                 'chunkId': result['chunkId'],
                 'documentId': result['documentId'],
                 'text': result['text'],
-                'keywords': result.get('keywords', []),
                 'score': result['@search.score']
             }
             for result in results
@@ -63,7 +62,7 @@ class SearchOperations:
             vector_queries=[vector_query],
             top=top,
             filter=filters,
-            select=["chunkId", "documentId", "text", "keywords"]
+            select=["chunkId", "documentId", "text"]
         )
         
         return [
@@ -71,7 +70,6 @@ class SearchOperations:
                 'chunkId': result['chunkId'],
                 'documentId': result['documentId'],
                 'text': result['text'],
-                'keywords': result.get('keywords', []),
                 'score': result['@search.score']
             }
             for result in results
@@ -96,7 +94,7 @@ class SearchOperations:
             vector_queries=[vector_query],
             top=top,
             filter=filters,
-            select=["chunkId", "documentId", "text", "keywords", "position"]
+            select=["chunkId", "documentId", "text", "position"]
         )
         
         return [
@@ -104,7 +102,6 @@ class SearchOperations:
                 'chunkId': result['chunkId'],
                 'documentId': result['documentId'],
                 'text': result['text'],
-                'keywords': result.get('keywords', []),
                 'position': result.get('position', 0),
                 'score': result['@search.score']
             }
@@ -132,7 +129,7 @@ class SearchOperations:
             semantic_configuration_name="semantic-config",
             top=top,
             filter=filters,
-            select=["chunkId", "documentId", "text", "keywords"]
+            select=["chunkId", "documentId", "text"]
         )
         
         return [
@@ -140,7 +137,6 @@ class SearchOperations:
                 'chunkId': result['chunkId'],
                 'documentId': result['documentId'],
                 'text': result['text'],
-                'keywords': result.get('keywords', []),
                 'score': result['@search.score'],
                 'rerankerScore': result.get('@search.reranker_score', 0)
             }

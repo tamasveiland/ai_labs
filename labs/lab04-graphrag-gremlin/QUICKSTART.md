@@ -43,6 +43,18 @@ cd ..
 
 ## Step 3: Deploy Infrastructure (15-20 minutes)
 
+### Option A: Interactive Notebook (Recommended)
+
+For a guided, step-by-step experience with explanations, open the **Environment Setup Notebook**:
+
+```bash
+jupyter notebook environment_setup.ipynb
+```
+
+The notebook walks you through each resource creation with detailed explanations.
+
+### Option B: Python Script
+
 ```bash
 # Authenticate with Azure
 az login
@@ -107,8 +119,10 @@ The indexer will:
 
 ## Step 7: Test Queries (1 minute)
 
+### Standard GraphRAG Query
+
 ```bash
-# Run a sample query
+# Run a sample query with graph validation
 python src/query_graphrag.py --query "azure ai services"
 
 # Run with verbose output
@@ -121,7 +135,24 @@ python src/query_graphrag.py --query "search and rag" --top 3
 python src/query_graphrag.py --query "azure openai" --semantic
 ```
 
+### Two-Phase Query (Recommended for Learning)
+
+The two-phase approach clearly separates search and graph exploration:
+
+```bash
+# Two-phase query: Semantic Search → Graph Exploration
+python src/custom_query_graphrag.py --query "azure ai services"
+
+# Get more results from Phase 1
+python src/custom_query_graphrag.py --query "graph database" --top 10
+
+# Output as JSON for integration
+python src/custom_query_graphrag.py --query "search and rag" --json
+```
+
 ## Example Query Output
+
+### Standard Query Output
 
 ```
 🔍 Processing query: 'azure ai services'
@@ -133,7 +164,7 @@ python src/query_graphrag.py --query "azure openai" --semantic
   Embedding dimensions: 3072
 
 [Step 3/5] Performing hybrid search...
-  Found 50 candidates
+  Found 4 candidates
 
 [Step 4/5] Validating with graph (keyword edges)...
   Validated 2 chunks with keyword edges
@@ -147,7 +178,7 @@ QUERY RESULTS
 
 Query: azure ai services
 Extracted Keywords: azure, services
-Total Candidates: 50
+Total Candidates: 4
 Top Results: 2
 
 Result #1
@@ -162,13 +193,90 @@ Azure AI Services provides comprehensive AI capabilities including OpenAI models
 Keywords: azure, ai, openai, services
 ```
 
+### Two-Phase Query Output
+
+```
+🔐 Authenticating and retrieving service configurations...
+🔧 Initializing Two-Phase GraphRAG client...
+
+================================================================================
+PHASE 1: SEMANTIC SEARCH (Azure AI Search)
+================================================================================
+
+📝 Query: 'azure ai services'
+🔄 Generating query embedding...
+   Embedding dimensions: 3072
+
+🔍 Performing hybrid search...
+
+✅ Found 4 matching chunks
+
+  [1] Chunk: chunk-001
+      Document: doc-001
+      Score: 0.0333
+      Text: Azure AI Services provides comprehensive AI capabilities...
+
+  [2] Chunk: chunk-002
+      Document: doc-001
+      Score: 0.0323
+      Text: Azure AI Search enables vector search and hybrid retrieval...
+
+================================================================================
+PHASE 2: GRAPH EXPLORATION (Cosmos DB Gremlin)
+================================================================================
+
+🔗 Exploring graph relationships for 4 chunks...
+
+  📊 Chunk: chunk-001
+     Related chunks: 1
+     Document: Azure AI Services Overview
+     Section: Introduction
+     Keywords: azure, ai, openai
+
+  📊 Chunk: chunk-002
+     Related chunks: 2
+     Document: Azure AI Services Overview
+     Section: Search Features
+     Keywords: search, vector, rag
+
+----------------------------------------
+GRAPH EXPLORATION SUMMARY
+----------------------------------------
+  Total related chunks found: 3
+  Unique documents: 2
+  Unique keywords: 5
+
+  Keywords: ai, azure, openai, rag, search
+
+================================================================================
+FINAL SUMMARY
+================================================================================
+
+📝 Query: 'azure ai services'
+
+🔍 Phase 1 - Semantic Search Results:
+   • Chunks found: 4
+
+🔗 Phase 2 - Graph Exploration Results:
+   • Related chunks discovered: 3
+   • Documents involved: 2
+   • Keywords extracted: 5
+
+   📌 All Keywords: ai, azure, openai, rag, search
+
+================================================================================
+```
+
 ## Common Commands
 
 ### Query Operations
 
 ```bash
-# Basic query
+# Standard query with graph validation
 python src/query_graphrag.py -q "your query here"
+
+# Two-phase query (search + graph exploration)
+python src/custom_query_graphrag.py -q "your query here"
 
 # Get more results
 python src/query_graphrag.py -q "your query" --top 10
@@ -178,6 +286,7 @@ python src/query_graphrag.py -q "your query" --no-graph-validation
 
 # Output as JSON
 python src/query_graphrag.py -q "your query" --json
+python src/custom_query_graphrag.py -q "your query" --json
 
 # Multi-tenant query
 python src/query_graphrag.py -q "your query" --tenant "tenant-id"
@@ -237,13 +346,36 @@ pip install -r scripts/requirements.txt
 pip install -r src/requirements.txt
 ```
 
+### Issue: Missing Azure Management SDK
+
+If you see errors like `ModuleNotFoundError: No module named 'azure.mgmt'`:
+
+```bash
+# Install Azure Management SDKs explicitly
+pip install azure-mgmt-search azure-mgmt-cosmosdb azure-mgmt-cognitiveservices
+```
+
+### Issue: Tenant Filter Returns No Results
+
+If queries return no results, check if your index has `tenant` set to `null`:
+- The query scripts automatically handle `null` tenant values
+- Use `--tenant default` or omit the flag to match both `null` and `'default'`
+
+### Issue: Gremlin Connection Fails with 403
+
+Verify your Cosmos DB database and graph names match what was deployed:
+- Check `COSMOS_DATABASE_NAME` (default: `graphrag-db`)
+- Check `COSMOS_GRAPH_NAME` (default: `knowledge-graph`)
+
 ## Next Steps
 
-1. **Explore Graph Queries**: Check `docs/graph_queries.md` for example Gremlin queries
-2. **Add Your Own Documents**: Modify sample documents in `data/sample_documents/`
-3. **Customize the Model**: Edit graph schema in `scripts/initialize_graph.py`
-4. **Integrate with Applications**: Use `src/graphrag_client.py` as a library
-5. **Scale Up**: Increase Cosmos DB throughput and Search service tier
+1. **Try the Jupyter Notebook**: Open `graphrag_demo.ipynb` for an interactive walkthrough
+2. **Try Two-Phase Queries**: Run `python src/custom_query_graphrag.py` to see search and graph phases clearly
+3. **Explore Graph Queries**: Check `docs/graph_queries.md` for example Gremlin queries
+4. **Add Your Own Documents**: Modify sample documents in `data/sample_documents/`
+5. **Customize the Model**: Edit graph schema in `scripts/initialize_graph.py`
+6. **Integrate with Applications**: Use `src/graphrag_client.py` as a library
+7. **Scale Up**: Increase Cosmos DB throughput and Search service tier
 
 ## Environment Variables
 
