@@ -1,0 +1,24 @@
+# Azure AI Projects SDK for Microsoft Foundry integration
+azure-ai-projects>=2.0.0b1
+
+# Azure Identity for authentication
+azure-identity>=1.15.0
+
+# Python environment variable loading
+python-dotenv>=1.0.0
+
+# Azure AI Agents SDK for agent framework
+azure-ai-agents>=1.0.0b1
+
+# Additional Azure AI services (optional but recommended)
+azure-ai-evaluation>=1.0.0b1
+
+# OpenAI SDK (included with azure-ai-projects but explicit for clarity)
+openai>=1.12.0
+
+# Async support for testing
+asyncio>=3.0.0
+
+# Development and testing dependencies (optional)
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
