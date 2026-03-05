@@ -1,0 +1,17 @@
+name: lab06-speech-conversation
+
+metadata:
+  template: lab06-speech-conversation@0.1.0
+
+# Infrastructure only — the application runs locally via Streamlit.
+# To deploy the app to Azure Container Apps, uncomment the services section below.
+#
+# services:
+#   app:
+#     project: ./src
+#     language: python
+#     host: containerapp
+
+infra:
+  provider: bicep
+  path: ./infra

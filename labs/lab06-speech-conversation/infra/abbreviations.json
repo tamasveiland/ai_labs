@@ -1,0 +1,8 @@
+{
+  "resourcesResourceGroups": "rg-",
+  "cognitiveServicesAccounts": "cog-",
+  "speechServicesAccounts": "spch-",
+  "keyVaultVaults": "kv-",
+  "operationalInsightsWorkspaces": "log-",
+  "insightsComponents": "appi-"
+}

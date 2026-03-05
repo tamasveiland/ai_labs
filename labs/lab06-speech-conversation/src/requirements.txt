@@ -1,0 +1,11 @@
+# Azure AI SDKs
+azure-cognitiveservices-speech>=1.40.0
+azure-identity>=1.17.0
+openai>=1.40.0
+
+# Streamlit & audio
+streamlit>=1.36.0
+audio-recorder-streamlit>=0.0.10
+
+# Configuration
+python-dotenv>=1.0.0
